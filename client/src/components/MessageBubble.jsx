@@ -9,11 +9,12 @@ const codeStyle = {
   ...vscDarkPlus,
   'pre[class*="language-"]': {
     ...vscDarkPlus['pre[class*="language-"]'],
-    background: 'rgba(5, 11, 20, 0.95)',
+    background: 'rgba(11, 7, 29, 0.97)',
     margin: 0,
-    borderRadius: '8px',
+    borderRadius: '0',
     padding: '0.85rem 1rem',
-    fontSize: '0.8rem',
+    fontSize: '0.79rem',
+    borderLeft: '2px solid rgba(251, 191, 36, 0.4)',
   },
 }
 
@@ -33,7 +34,7 @@ export default function MessageBubble({ role, content, sources = [], indexedPath
     <div className={`msg-row ${isUser ? 'user' : 'assistant'}`}>
       {/* Avatar */}
       <div className={`msg-avatar ${isUser ? 'avatar-user' : 'avatar-assistant'}`}>
-        {isUser ? '👤' : '🤖'}
+        {isUser ? '✦' : '🔮'}
       </div>
 
       {/* Bubble */}
@@ -84,12 +85,12 @@ export default function MessageBubble({ role, content, sources = [], indexedPath
                 <motion.span
                   key={i}
                   className="source-chip"
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: i * 0.05 }}
+                  initial={{ opacity: 0, scale: 0.8, y: 4 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ delay: i * 0.06, type: 'spring', stiffness: 300, damping: 24 }}
                   title={src}
                 >
-                  📄 {display || basename(src)}
+                  ◈ {display || basename(src)}
                 </motion.span>
               )
             })}

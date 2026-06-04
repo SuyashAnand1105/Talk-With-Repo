@@ -1,22 +1,27 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const DEFAULT_LLM       = import.meta.env.VITE_LLM_MODEL   || 'nova-micro (from .env)'
-const DEFAULT_EMBED     = import.meta.env.VITE_EMBED_MODEL  || 'text-embedding-3-small'
-const DEFAULT_ENDPOINT  = 'from .env / api.openai.com'
+const DEFAULT_LLM      = import.meta.env.VITE_LLM_MODEL  || 'nova-micro (from .env)'
+const DEFAULT_EMBED    = import.meta.env.VITE_EMBED_MODEL || 'text-embedding-3-small'
 
-/**
- * Sidebar component — repo input, stats, indexing controls, and provider settings.
- */
+/** RuneDivider — decorative gold separator */
+const RuneDivider = () => (
+  <div className="rune-divider">
+    <span className="rune-divider-symbol">◈</span>
+  </div>
+)
+
+/** ArcaneLabel — gold-styled section heading */
+const ArcaneLabel = ({ children }) => (
+  <div className="arcane-section-title">{children}</div>
+)
+
 export default function Sidebar({
-  // Repo
   repoPath, setRepoPath,
   scanSummary, indexExists, isActive,
-  // Actions
-  indexRepo, loadRepo, clearChat,
-  // Flags
-  indexing, loading, indexProgress, error, setError,
-  // Settings
+  indexRepo,
+  clearChat,
+  indexing, indexProgress, error, setError,
   baseUrl, setBaseUrl,
   llmModel, setLlmModel,
   embeddingModel, setEmbeddingModel,
@@ -27,19 +32,19 @@ export default function Sidebar({
   const hasPath   = Boolean(cleanPath)
   const hasError  = scanSummary?.error
 
-  // Status badge
   let badge = null
   if (isActive) {
     badge = <span className="badge badge-success">✓ Indexed &amp; Active</span>
   } else if (indexExists && hasPath && !hasError) {
-    badge = <span className="badge badge-info">💾 Index on disk</span>
+    badge = <span className="badge badge-info">◈ Index on Disk</span>
   } else if (hasPath && !hasError && scanSummary) {
-    badge = <span className="badge badge-warning">⏳ Not indexed</span>
+    badge = <span className="badge badge-warning">⧡ Not Indexed</span>
   }
 
   return (
     <aside className="sidebar">
-      {/* ── Header ──────────────────────────────────────────────────────── */}
+
+      {/* ── Grimoire Header ────────────────────────────────────────────── */}
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <span className="sidebar-logo-emoji">🔭</span>
@@ -50,20 +55,22 @@ export default function Sidebar({
         </div>
       </div>
 
-      {/* ── Scrollable body ──────────────────────────────────────────────── */}
+      {/* ── Scrollable Grimoire Body ───────────────────────────────────── */}
       <div className="sidebar-scroll">
 
-        {/* Repo path */}
-        <div className="field">
-          <label className="field-label section-title">📁 Repository Path</label>
-          <input
-            id="repo-path-input"
-            className="input"
-            value={repoPath}
-            onChange={e => setRepoPath(e.target.value)}
-            placeholder="e.g.  C:/Projects/my-app"
-            spellCheck={false}
-          />
+        {/* Repository path */}
+        <div className="arcane-field">
+          <label className="arcane-label">Repository Path</label>
+          <div className="arcane-input-wrap">
+            <input
+              id="repo-path-input"
+              className="arcane-input"
+              value={repoPath}
+              onChange={e => setRepoPath(e.target.value)}
+              placeholder="e.g.  C:/Projects/my-app"
+              spellCheck={false}
+            />
+          </div>
         </div>
 
         {/* Scan stats */}
@@ -74,7 +81,7 @@ export default function Sidebar({
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.28 }}
             >
               <div className="stat-grid">
                 <div className="stat-card">
@@ -95,7 +102,7 @@ export default function Sidebar({
           )}
         </AnimatePresence>
 
-        {/* Error on path */}
+        {/* Path error */}
         {hasPath && hasError && (
           <div className="error-banner">⚠ {scanSummary.error}</div>
         )}
@@ -103,45 +110,28 @@ export default function Sidebar({
         {/* Status badge */}
         {badge && <div>{badge}</div>}
 
-        <div className="divider" />
+        <RuneDivider />
 
-        {/* Action buttons */}
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <motion.button
-            id="btn-index"
-            className="btn btn-primary btn-sm"
-            style={{ flex: 1 }}
-            disabled={!hasPath || !!hasError || indexing || loading}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={indexRepo}
-          >
-            {indexing ? (
-              <><span className="anim-spin" style={{ display:'inline-block' }}>⟳</span> Indexing…</>
-            ) : '⚡ Index'}
-          </motion.button>
+        {/* Action button — full width */}
+        <motion.button
+          id="btn-index"
+          className="btn btn-primary btn-sm btn-block"
+          disabled={!hasPath || !!hasError || indexing}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.94 }}
+          onClick={indexRepo}
+        >
+          {indexing
+            ? <><span className="anim-spin">⟳</span> Indexing…</>
+            : isActive ? '⚡ Re-Index' : '⚡ Index'}
+        </motion.button>
 
-          <motion.button
-            id="btn-load"
-            className="btn btn-secondary btn-sm"
-            style={{ flex: 1 }}
-            disabled={!indexExists || isActive || loading || indexing}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={loadRepo}
-          >
-            {loading ? (
-              <><span className="anim-spin" style={{ display:'inline-block' }}>⟳</span> Loading…</>
-            ) : '📂 Load'}
-          </motion.button>
-        </div>
-
-        {/* Indexing progress log */}
+        {/* Indexing progress */}
         <AnimatePresence>
           {indexing && indexProgress.length > 0 && (
             <motion.div
               key="progress"
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
             >
@@ -174,80 +164,79 @@ export default function Sidebar({
           )}
         </AnimatePresence>
 
-        <div className="divider" />
+        <RuneDivider />
 
-        {/* Provider settings (collapsible) */}
+        {/* Provider settings */}
         <div>
           <div
             id="settings-toggle"
-            className="collapsible-header section-title"
-            style={{ color: 'var(--text-muted)' }}
+            className="collapsible-header arcane-section-title"
             onClick={() => setSettingsOpen(o => !o)}
           >
-            <span>⚙️ Provider Settings</span>
+            <span>⚙ Provider Settings</span>
             <span className={`chevron ${settingsOpen ? 'open' : ''}`}>▼</span>
           </div>
 
           <div className={`collapsible-body ${settingsOpen ? 'open' : 'closed'}`}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', paddingTop: '0.65rem' }}>
-              <div className="field">
-                <label className="field-label">Base URL</label>
-                <input
-                  id="input-base-url"
-                  className="input"
-                  value={baseUrl}
-                  onChange={e => setBaseUrl(e.target.value)}
-                  placeholder="https://api.openai.com/v1"
-                />
+
+              <div className="arcane-field">
+                <label className="arcane-label">Base URL</label>
+                <div className="arcane-input-wrap">
+                  <input
+                    id="input-base-url"
+                    className="arcane-input"
+                    value={baseUrl}
+                    onChange={e => setBaseUrl(e.target.value)}
+                    placeholder="https://api.openai.com/v1"
+                  />
+                </div>
               </div>
-              <div className="field">
-                <label className="field-label">Chat model</label>
-                <input
-                  id="input-llm-model"
-                  className="input"
-                  value={llmModel}
-                  onChange={e => setLlmModel(e.target.value)}
-                  placeholder={DEFAULT_LLM}
-                />
+
+              <div className="arcane-field">
+                <label className="arcane-label">Chat Model</label>
+                <div className="arcane-input-wrap">
+                  <input
+                    id="input-llm-model"
+                    className="arcane-input"
+                    value={llmModel}
+                    onChange={e => setLlmModel(e.target.value)}
+                    placeholder={DEFAULT_LLM}
+                  />
+                </div>
               </div>
-              <div className="field">
-                <label className="field-label">Embedding model</label>
-                <input
-                  id="input-embed-model"
-                  className="input"
-                  value={embeddingModel}
-                  onChange={e => setEmbeddingModel(e.target.value)}
-                  placeholder={DEFAULT_EMBED}
-                />
+
+              <div className="arcane-field">
+                <label className="arcane-label">Embedding Model</label>
+                <div className="arcane-input-wrap">
+                  <input
+                    id="input-embed-model"
+                    className="arcane-input"
+                    value={embeddingModel}
+                    onChange={e => setEmbeddingModel(e.target.value)}
+                    placeholder={DEFAULT_EMBED}
+                  />
+                </div>
               </div>
+
             </div>
           </div>
         </div>
 
-        <div className="divider" />
+        <RuneDivider />
 
-        {/* Clear chat */}
+        {/* Clear conversation */}
         <motion.button
           id="btn-clear-chat"
           className="btn btn-danger btn-sm btn-block"
           whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
+          whileTap={{ scale: 0.96 }}
           onClick={clearChat}
         >
-          🗑️ Clear Conversation
+          🗑 Clear Conversation
         </motion.button>
 
       </div>{/* end sidebar-scroll */}
-
-      {/* ── Footer ──────────────────────────────────────────────────────── */}
-      <div className="sidebar-footer">
-        <div className="sidebar-footer-info">
-          <b>LLM:</b> <span>{llmModel || DEFAULT_LLM}</span><br />
-          <b>Embed:</b> <span>{embeddingModel || DEFAULT_EMBED}</span><br />
-          <b>Endpoint:</b> <span>{baseUrl || DEFAULT_ENDPOINT}</span><br />
-          <b>Store:</b> <span>ChromaDB (local)</span>
-        </div>
-      </div>
     </aside>
   )
 }

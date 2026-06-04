@@ -62,13 +62,13 @@ export default function CodeRain({ opacity = 0.14 }) {
         const isLead = drops[i] % 1 < 0.1
         const alpha  = isLead ? 0.95 : 0.25 + Math.random() * 0.35
 
-        // Colour varies by column seed: blue, cyan, or purple tint
-        if (colors[i] < 0.5) {
-          ctx.fillStyle = `rgba(96, 165, 250, ${alpha})`   // blue-400
-        } else if (colors[i] < 0.8) {
-          ctx.fillStyle = `rgba(34, 211, 238, ${alpha})`   // cyan-400
+        // Colour varies by column seed: gold, purple, or teal
+        if (colors[i] < 0.45) {
+          ctx.fillStyle = `rgba(251, 191, 36, ${alpha})`    // gold-400
+        } else if (colors[i] < 0.75) {
+          ctx.fillStyle = `rgba(192, 132, 252, ${alpha})`   // purple-400
         } else {
-          ctx.fillStyle = `rgba(167, 139, 250, ${alpha})`  // purple-400
+          ctx.fillStyle = `rgba(45, 212, 191, ${alpha})`    // teal-400
         }
 
         ctx.fillText(char, x, y)

@@ -12,6 +12,7 @@ import os
 import logging
 from pathlib import Path
 from typing import List
+import pathspec
 
 from langchain_community.document_loaders.generic import GenericLoader
 from langchain_community.document_loaders.parsers import LanguageParser
@@ -26,15 +27,27 @@ logger = logging.getLogger(__name__)
 
 # ── Extension → LangChain Language mapping ────────────────────────────────────
 _LANGUAGE_MAP = {
-    ".py":   Language.PYTHON,
-    ".js":   Language.JS,
-    ".ts":   Language.TS,
-    ".html": Language.HTML,
-    ".java": Language.JAVA,
-    ".cpp":  Language.CPP,
-    ".c":    Language.C,
-    ".go":   Language.GO,
-    ".rs":   Language.RUST,
+    ".py":    Language.PYTHON,
+    ".js":    Language.JS,
+    ".jsx":   Language.JS,
+    ".ts":    Language.TS,
+    ".tsx":   Language.TS,
+    ".html":  Language.HTML,
+    ".htm":   Language.HTML,
+    ".java":  Language.JAVA,
+    ".cpp":   Language.CPP,
+    ".c":     Language.C,
+    ".h":     Language.C,
+    ".hpp":   Language.CPP,
+    ".go":    Language.GO,
+    ".rs":    Language.RUST,
+    ".rb":    Language.RUBY,
+    ".php":   Language.PHP,
+    ".cs":    Language.CSHARP,
+    ".scala": Language.SCALA,
+    ".kt":    Language.KOTLIN,
+    ".swift": Language.SWIFT,
+    ".sol":   Language.SOL,
 }
 
 
@@ -115,15 +128,24 @@ def _fallback_load(repo_path: str) -> List[Document]:
     from langchain_community.document_loaders import TextLoader
 
     documents: List[Document] = []
-    excluded_dirs = {"node_modules", ".git", "__pycache__", "venv", ".venv",
-                     "dist", "build", ".chroma_db", "chroma_stores"}
+    repo_path = os.path.abspath(repo_path)
+    
+    # Compile exclude patterns
+    spec = pathspec.PathSpec.from_lines("gitwildmatch", config.EXCLUDED_PATTERNS)
 
     for root, dirs, files in os.walk(repo_path):
-        # Prune excluded directories in-place
-        dirs[:] = [d for d in dirs if d not in excluded_dirs]
+        # We must compute relative paths to match against pathspec properly
         for fname in files:
+            fpath = os.path.join(root, fname)
+            rel_path = os.path.relpath(fpath, repo_path)
+            
+            # Convert Windows backslashes to forward slashes for pathspec
+            rel_path_unix = rel_path.replace(os.sep, "/")
+            
+            if spec.match_file(rel_path_unix):
+                continue
+                
             if Path(fname).suffix.lower() in config.SUPPORTED_SUFFIXES:
-                fpath = os.path.join(root, fname)
                 try:
                     loader = TextLoader(fpath, encoding="utf-8", autodetect_encoding=True)
                     documents.extend(loader.load())
@@ -142,14 +164,23 @@ def get_file_summary(repo_path: str) -> dict:
     if not os.path.isdir(repo_path):
         return {"error": f"Path not found: {repo_path}"}
 
-    excluded_dirs = {"node_modules", ".git", "__pycache__", "venv", ".venv",
-                     "dist", "build", ".chroma_db", "chroma_stores"}
     files_by_ext: dict[str, int] = {}
     total = 0
 
+    # Compile exclude patterns
+    spec = pathspec.PathSpec.from_lines("gitwildmatch", config.EXCLUDED_PATTERNS)
+
     for root, dirs, files in os.walk(repo_path):
-        dirs[:] = [d for d in dirs if d not in excluded_dirs]
         for fname in files:
+            fpath = os.path.join(root, fname)
+            rel_path = os.path.relpath(fpath, repo_path)
+            
+            # Convert Windows backslashes to forward slashes for pathspec
+            rel_path_unix = rel_path.replace(os.sep, "/")
+            
+            if spec.match_file(rel_path_unix):
+                continue
+                
             ext = Path(fname).suffix.lower()
             if ext in config.SUPPORTED_SUFFIXES:
                 files_by_ext[ext] = files_by_ext.get(ext, 0) + 1

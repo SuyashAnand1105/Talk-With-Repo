@@ -96,6 +96,13 @@ def cmd_index(p: dict) -> None:
     llm_model       = p.get("llm_model")       or _ENV_LLM_MODEL
 
     try:
+        # Release the old chain NOW so Windows frees the ChromaDB file handles
+        # before build_vector_store() calls shutil.rmtree() on the same directory.
+        if _qa_chain is not None:
+            _qa_chain     = None
+            _indexed_path = None
+            import gc; gc.collect()
+
         _send({"type": "progress", "message": "📂 Scanning and parsing source files…"})
         docs = load_and_split_codebase(repo_path)
 

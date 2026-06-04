@@ -4,25 +4,25 @@ import CodeRain from '../components/CodeRain'
 
 const FEATURES = [
   {
-    icon: '🔍',
+    icon: '🔮',
     title: 'Semantic Search',
-    desc:  'Vector embeddings power deep understanding of your codebase — far beyond simple keyword matching.',
+    desc:  'Vector embeddings grant deep understanding of your codebase — far beyond simple keyword matching.',
   },
   {
-    icon: '🧠',
+    icon: '📜',
     title: 'AI-Powered Q&A',
-    desc:  'Ask natural-language questions. Get grounded answers sourced directly from your code.',
+    desc:  'Ask natural-language questions. Receive grounded answers sourced directly from your code.',
   },
   {
-    icon: '📂',
+    icon: '🌟',
     title: 'Source Citations',
     desc:  'Every answer links back to the exact files where the logic lives — no guessing required.',
   },
 ]
 
 const STACK_PILLS = [
-  'RAG Pipeline', 'GPT-4o-mini', 'ChromaDB', 'text-embedding-3-small',
-  'LangChain', 'tree-sitter', 'Python + Node.js',
+  'RAG Pipeline', 'ChromaDB', 'LangChain',
+  'text-embedding-3-small', 'tree-sitter', 'Python + Node.js',
 ]
 
 const container = {
@@ -40,10 +40,10 @@ export default function LandingPage() {
 
   return (
     <div className="landing-root">
-      {/* Animated code rain background */}
-      <CodeRain opacity={0.16} />
+      {/* Animated fantasy code rain background */}
+      <CodeRain opacity={0.13} />
 
-      {/* Gradient overlays */}
+      {/* Radial gradient overlays */}
       <div className="landing-overlay" />
 
       {/* Main content */}
@@ -54,10 +54,10 @@ export default function LandingPage() {
           animate="show"
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}
         >
-          {/* Badge */}
+          {/* Arcane badge */}
           <motion.div variants={item} className="landing-badge">
             <span className="landing-badge-dot" />
-            AI Codebase Navigator
+            ✦ AI-Powered Code Intelligence ✦
           </motion.div>
 
           {/* Title */}
@@ -69,7 +69,7 @@ export default function LandingPage() {
           {/* Subtitle */}
           <motion.p variants={item} className="landing-sub">
             Ask natural-language questions about any local codebase.<br />
-            Powered by RAG, embeddings, and a persistent AI chain — results in seconds.
+            Powered by RAG, vector embeddings, and a persistent AI chain — answers in seconds.
           </motion.p>
 
           {/* CTA buttons */}
@@ -81,7 +81,7 @@ export default function LandingPage() {
               whileTap={{ scale: 0.97 }}
               onClick={() => navigate('/app')}
             >
-              Start Exploring →
+              ✦ Launch App
             </motion.button>
 
             <motion.button
@@ -101,7 +101,7 @@ export default function LandingPage() {
               <motion.div
                 key={f.title}
                 variants={item}
-                whileHover={{ y: -4, boxShadow: '0 12px 45px rgba(59,130,246,0.2)' }}
+                whileHover={{ y: -4 }}
                 className="feature-card"
               >
                 <span className="feature-icon">{f.icon}</span>

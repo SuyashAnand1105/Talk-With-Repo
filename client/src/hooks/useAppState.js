@@ -36,7 +36,8 @@ export function useAppState() {
   const [messages,  setMessages]  = useState([])
   const [querying,  setQuerying]  = useState(false)
 
-  const scanTimer = useRef(null)
+  const scanTimer      = useRef(null)
+  const prevIndexExists = useRef(false)   // tracks transitions for auto-load
 
   // ── On mount: check if bridge already has a loaded repo ───────────────────
   useEffect(() => {
@@ -78,6 +79,21 @@ export function useAppState() {
 
     return () => clearTimeout(scanTimer.current)
   }, [repoPath])
+
+  // ── Auto-load: silently load an existing index when detected ──────────────
+  // Fires when indexExists transitions false→true AND no chain is active yet.
+  useEffect(() => {
+    const justAppeared = indexExists && !prevIndexExists.current
+    prevIndexExists.current = indexExists
+
+    if (!justAppeared || isActive || loading || indexing) return
+    const path = repoPath.trim().replace(/^["']|["']$/g, '')
+    if (!path) return
+
+    // Silently load the existing index (no button click required)
+    loadRepo()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [indexExists])
 
   // ── Index (SSE streaming) ─────────────────────────────────────────────────
   const indexRepo = useCallback(async () => {
@@ -227,7 +243,6 @@ export function useAppState() {
     embeddingModel, setEmbeddingModel,
     // Flags
     indexing,
-    loading,
     indexProgress,
     error, setError,
     // Chat
@@ -235,7 +250,6 @@ export function useAppState() {
     querying,
     // Actions
     indexRepo,
-    loadRepo,
     sendMessage,
     clearChat,
     // Constants
