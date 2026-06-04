@@ -50,6 +50,17 @@ from src.engine import (  # noqa: E402
     index_exists,
 )
 
+# ── Env-var defaults (override config.py; UI settings override these) ────────────
+import os as _os
+_ENV_BASE_URL    = _os.getenv("OPENAI_BASE_URL",        "").strip() or None
+_ENV_LLM_MODEL   = _os.getenv("OPENAI_LLM_MODEL",       "").strip() or None
+_ENV_EMBED_MODEL = _os.getenv("OPENAI_EMBEDDING_MODEL",  "").strip() or None
+
+logger.info("Bridge defaults — base_url=%s  llm=%s  embed=%s",
+            _ENV_BASE_URL,
+            _ENV_LLM_MODEL   or config.LLM_MODEL,
+            _ENV_EMBED_MODEL or config.EMBEDDING_MODEL)
+
 # ── In-memory state ────────────────────────────────────────────────────────────
 _qa_chain = None
 _indexed_path: str | None = None
@@ -80,9 +91,9 @@ def cmd_index(p: dict) -> None:
     global _qa_chain, _indexed_path
 
     repo_path       = p.get("repo_path", "").strip()
-    base_url        = p.get("base_url") or None
-    embedding_model = p.get("embedding_model") or None
-    llm_model       = p.get("llm_model") or None
+    base_url        = p.get("base_url")        or _ENV_BASE_URL
+    embedding_model = p.get("embedding_model") or _ENV_EMBED_MODEL
+    llm_model       = p.get("llm_model")       or _ENV_LLM_MODEL
 
     try:
         _send({"type": "progress", "message": "📂 Scanning and parsing source files…"})
@@ -106,9 +117,9 @@ def cmd_load(p: dict) -> None:
     global _qa_chain, _indexed_path
 
     repo_path       = p.get("repo_path", "").strip()
-    base_url        = p.get("base_url") or None
-    embedding_model = p.get("embedding_model") or None
-    llm_model       = p.get("llm_model") or None
+    base_url        = p.get("base_url")        or _ENV_BASE_URL
+    embedding_model = p.get("embedding_model") or _ENV_EMBED_MODEL
+    llm_model       = p.get("llm_model")       or _ENV_LLM_MODEL
 
     try:
         vs = load_vector_store(repo_path, base_url=base_url, embedding_model=embedding_model)

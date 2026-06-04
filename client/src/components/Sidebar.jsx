@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const DEFAULT_LLM       = 'gpt-4o-mini'
-const DEFAULT_EMBED     = 'text-embedding-3-small'
-const DEFAULT_ENDPOINT  = 'api.openai.com (default)'
+const DEFAULT_LLM       = import.meta.env.VITE_LLM_MODEL   || 'nova-micro (from .env)'
+const DEFAULT_EMBED     = import.meta.env.VITE_EMBED_MODEL  || 'text-embedding-3-small'
+const DEFAULT_ENDPOINT  = 'from .env / api.openai.com'
 
 /**
  * Sidebar component — repo input, stats, indexing controls, and provider settings.
