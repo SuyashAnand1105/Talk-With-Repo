@@ -89,7 +89,7 @@ export default function LandingPage() {
               className="cta-secondary"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
-              onClick={() => window.open('https://github.com', '_blank')}
+              onClick={() => window.open('https://github.com/SuyashAnand1105/Talk-With-Repo', '_blank')}
             >
               View on GitHub
             </motion.button>
