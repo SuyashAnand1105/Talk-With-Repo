@@ -115,6 +115,7 @@ cd ..
 Create a `.env` file in the root directory:
 ```env
 OPENAI_API_KEY=your_api_key_here
+OPENAI_BASE_URL=your_base_url
 ```
 *(Optionally override models or base URLs in the `.env` file as needed).*
 
