@@ -17,6 +17,7 @@ from typing import List, Tuple, Callable, Any
 
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+# pyrefly: ignore [missing-import]
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_classic.chains import create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
