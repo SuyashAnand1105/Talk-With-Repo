@@ -127,7 +127,7 @@ npm run dev
 
 The application will be running at **http://localhost:3000**!
 
-mermaid
+```mermaid
 flowchart TD
   A["Run npm run dev"] --> B["Start Node Express server on port 3001"]
   A --> C["Start Vite React client on port 3000"]
@@ -163,3 +163,4 @@ flowchart TD
   Z --> AA["Retriever finds relevant code chunks"]
   AA --> AB["LLM generates answer from retrieved context"]
   AB --> AC["React renders markdown answer and source files"]
+```
