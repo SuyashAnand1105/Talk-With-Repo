@@ -126,3 +126,40 @@ npm run dev
 ```
 
 The application will be running at **http://localhost:3000**!
+
+mermaid
+flowchart TD
+  A["Run npm run dev"] --> B["Start Node Express server on port 3001"]
+  A --> C["Start Vite React client on port 3000"]
+
+  B --> D["Load server/python_bridge.js"]
+  D --> E["Start bridge.py as persistent Python process"]
+  E --> F["Python waits for JSON commands"]
+
+  C --> G["User opens /app"]
+  G --> H["useAppState calls /api/repo/status"]
+  G --> I["User enters repository path"]
+
+  I --> J["GET /api/repo/scan"]
+  I --> K["GET /api/repo/index-exists"]
+  J --> L["Sidebar shows file summary"]
+  K --> L
+
+  L --> M["User clicks Index"]
+  M --> N["POST /api/repo/index"]
+  N --> O["Node sends index command to Python"]
+  O --> P["bridge.py runs cmd_index"]
+  P --> Q["ingester.py scans files"]
+  Q --> R["ingester.py splits files into chunks"]
+  R --> S["engine.py creates embeddings"]
+  S --> T["ChromaDB stores vector index"]
+  T --> U["engine.py creates QA chain"]
+  U --> V["Repository is active in memory"]
+
+  V --> W["User asks a question"]
+  W --> X["POST /api/chat/query"]
+  X --> Y["Node sends query command to Python"]
+  Y --> Z["bridge.py runs cmd_query"]
+  Z --> AA["Retriever finds relevant code chunks"]
+  AA --> AB["LLM generates answer from retrieved context"]
+  AB --> AC["React renders markdown answer and source files"]
