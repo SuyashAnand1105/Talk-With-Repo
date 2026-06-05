@@ -10,7 +10,9 @@ config.py — Central configuration for Talk-With-Repo
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 # OpenAI model for answering questions
-LLM_MODEL = "gpt-4o-mini"
+# LLM_MODEL = "gpt-4o-mini"
+LLM_MODEL = "gpt-4.1-nano"
+
 
 # Lower temperature = more accurate code explanations
 LLM_TEMPERATURE = 0.2
