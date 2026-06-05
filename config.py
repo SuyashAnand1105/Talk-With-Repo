@@ -1,87 +1,112 @@
 """
-config.py — Central configuration for Talk-With-Repo.
-Modify these values to customize scanning behaviour.
+config.py — Central configuration for Talk-With-Repo
 """
 
-# ── LLM / Embedding Models ────────────────────────────────────────────────────
-EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2" # Free, fast local embeddings
-LLM_MODEL       = "gpt-4o-mini"              # Fast, cost-efficient OpenAI model
-LLM_TEMPERATURE = 0.3
+# ─────────────────────────────────────────────────────────────
+# Models
+# ─────────────────────────────────────────────────────────────
 
-# ── Retrieval ─────────────────────────────────────────────────────────────────
-RETRIEVER_K = 8          # Number of top-k chunks to retrieve per query
+# Local embeddings (free, fast)
+EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
-# ── Chunking ──────────────────────────────────────────────────────────────────
-CHUNK_SIZE    = 800     # ~530 tokens/chunk — Original config size
-CHUNK_OVERLAP = 100     # Enough overlap to preserve cross-chunk context
-PARSER_THRESHOLD = 50    # LanguageParser: min token threshold to attempt parse
-MIN_CHUNK_CHARS  = 120   # Discard chunks shorter than this (bare import/header lines)
-EMBED_BATCH_SIZE = 1     # One chunk per incremental store call
+# OpenAI model for answering questions
+LLM_MODEL = "gpt-4o-mini"
 
-# ── File Extensions to Index ──────────────────────────────────────────────────
+# Lower temperature = more accurate code explanations
+LLM_TEMPERATURE = 0.2
+
+
+# ─────────────────────────────────────────────────────────────
+# Retrieval
+# ─────────────────────────────────────────────────────────────
+
+# Number of chunks retrieved for each question
+RETRIEVER_K = 8
+
+
+# ─────────────────────────────────────────────────────────────
+# Chunking
+# ─────────────────────────────────────────────────────────────
+
+# Larger chunks preserve more code context
+CHUNK_SIZE = 1000
+
+# Overlap prevents context loss between chunks
+CHUNK_OVERLAP = 150
+
+# Minimum tokens before AST parser activates
+PARSER_THRESHOLD = 50
+
+# Ignore tiny chunks such as imports
+MIN_CHUNK_CHARS = 120
+
+# Local embeddings can safely process larger batches
+EMBED_BATCH_SIZE = 32
+
+
+# ─────────────────────────────────────────────────────────────
+# Supported File Types
+# ─────────────────────────────────────────────────────────────
+
 SUPPORTED_SUFFIXES = [
-    # ── Core languages (Language-aware AST splitting) ──────────────────────
-    # NOTE: JS/JSX/TS/TSX require `pip install esprima` for smart chunking;
-    #       without it they fall back to plain-text splitting (still indexed OK).
-    ".py",   ".js",   ".ts",  ".jsx",  ".tsx",
-    ".java", ".cpp",  ".c",   ".h",    ".hpp",
-    ".go",   ".rs",   ".rb",  ".php",  ".cs",
-    ".swift",".kt",   ".scala",
+    ".py", ".js", ".ts", ".jsx", ".tsx",
+    ".java", ".cpp", ".c", ".h", ".hpp",
+    ".go", ".rs", ".rb", ".php", ".cs",
+    ".swift", ".kt", ".scala",
 
-    # ── Web / templating (generic splitting) ──────────────────────────────
-    ".html", ".htm",  ".css", ".scss", ".sass", ".less",
-    ".svelte",".vue",
+    ".html", ".htm",
+    ".css", ".scss", ".sass", ".less",
+    ".vue", ".svelte",
 
-    # ── Config / data (generic splitting) ────────────────────────────────
-    # NOTE: .env is excluded (security — contains secrets). Multi-dot extensions
-    #       like .env.example never match via Path.suffix, so they are omitted.
     ".json", ".jsonc",
     ".yaml", ".yml",
-    ".toml", ".ini",  ".cfg",  ".conf", ".properties",
-    ".xml",  ".csv",
+    ".toml", ".ini", ".cfg", ".conf",
+    ".properties",
 
-    # ── Shell / scripts (generic splitting) ─────────────────────────────
-    # NOTE: Makefile/Dockerfile have no extension so .makefile/.dockerfile
-    #       never match via Path.suffix. Use the file-name excludes below.
-    ".sh",   ".bash", ".zsh",  ".fish",
-    ".bat",  ".ps1",  ".cmd",
+    ".xml", ".csv",
 
-    # ── SQL / query languages (generic splitting) ─────────────────────────
-    ".sql",  ".graphql", ".gql",
+    ".sh", ".bash", ".zsh",
+    ".fish", ".bat", ".cmd", ".ps1",
 
-    # ── Docs / text (generic splitting) ──────────────────────────────────
-    ".md",   ".mdx",  ".rst",  ".txt",
-    ".adoc",
+    ".sql", ".graphql", ".gql",
 
-    # ── IaC / CI (generic splitting) ───────────────────────────────────
+    ".md", ".mdx", ".rst", ".txt",
+
     ".tf",
 ]
 
-# ── Directories / Files to Exclude ────────────────────────────────────────────
+
+# ─────────────────────────────────────────────────────────────
+# Excluded Files / Directories
+# ─────────────────────────────────────────────────────────────
+
 EXCLUDED_PATTERNS = [
     "**/node_modules/**",
     "**/.git/**",
     "**/__pycache__/**",
     "**/venv/**",
     "**/.venv/**",
+
     "**/dist/**",
     "**/build/**",
-    # ChromaDB stores — exclude entire vector DB directory (binary + index files)
+    "**/.next/**",
+    "**/coverage/**",
+
     "**/.chroma_db/**",
     "**/chroma_stores/**",
-    # Lock files — large and not useful for Q&A
+
     "**/package-lock.json",
     "**/yarn.lock",
     "**/pnpm-lock.yaml",
     "**/poetry.lock",
     "**/Pipfile.lock",
-    # Security: never index secret/credential files
+
     "**/.env",
     "**/.env.*",
     "**/secrets.*",
     "**/*.pem",
     "**/*.key",
-    # Binary / compiled artifacts
+
     "**/*.pyc",
     "**/*.pyo",
     "**/*.class",
@@ -93,5 +118,9 @@ EXCLUDED_PATTERNS = [
     "**/*.arrow",
 ]
 
-# ── ChromaDB Persistence ──────────────────────────────────────────────────────
-CHROMA_BASE_DIR = "./chroma_stores"  # Root dir; each repo gets a sub-folder
+
+# ─────────────────────────────────────────────────────────────
+# ChromaDB Storage
+# ─────────────────────────────────────────────────────────────
+
+CHROMA_BASE_DIR = "./chroma_stores"
