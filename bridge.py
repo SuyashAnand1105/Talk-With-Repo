@@ -38,7 +38,16 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, str(Path(__file__).parent))
 
 from dotenv import load_dotenv
-load_dotenv()
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+load_dotenv(ROOT / ".env")
+
+import os
+print(
+    f"OPENAI_API_KEY loaded: {bool(os.getenv('OPENAI_API_KEY'))}",
+    file=sys.stderr
+)
 
 import config  # noqa: E402
 from src.ingester import load_and_split_codebase, get_file_summary  # noqa: E402

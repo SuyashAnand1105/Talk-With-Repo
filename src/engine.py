@@ -107,7 +107,10 @@ def _get_embeddings(
     }
     if base_url:
         kwargs["openai_api_base"] = base_url
-    return _RetryEmbeddings(**kwargs)
+    return _RetryEmbeddings(
+        api_key=os.getenv("OPENAI_API_KEY"),
+        **kwargs
+    )
 
 
 # ── Vector Store ──────────────────────────────────────────────────────────────
@@ -311,7 +314,10 @@ def create_qa_chain(
     if base_url:
         llm_kwargs["base_url"] = base_url
 
-    llm = ChatOpenAI(**llm_kwargs)
+    llm = ChatOpenAI(
+        api_key=os.getenv("OPENAI_API_KEY"),
+        **llm_kwargs
+    )
 
     prompt = ChatPromptTemplate.from_messages([
         ("system", _SYSTEM_PROMPT),
