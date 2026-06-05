@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
@@ -29,6 +30,19 @@ function basename(filePath) {
  */
 export default function MessageBubble({ role, content, sources = [], indexedPath = '' }) {
   const isUser = role === 'user'
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    if (!content) return
+
+    try {
+      await navigator.clipboard.writeText(content)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1400)
+    } catch {
+      setCopied(false)
+    }
+  }
 
   return (
     <div className={`msg-row ${isUser ? 'user' : 'assistant'}`}>
@@ -39,6 +53,18 @@ export default function MessageBubble({ role, content, sources = [], indexedPath
 
       {/* Bubble */}
       <div className={`msg-bubble ${isUser ? 'bubble-user' : 'bubble-assistant'}`}>
+        <div className="message-actions">
+          <button
+            type="button"
+            className={`copy-message-btn ${copied ? 'copied' : ''}`}
+            onClick={handleCopy}
+            title="Copy message"
+            aria-label={copied ? 'Message copied' : 'Copy message'}
+          >
+            {copied ? 'Copied' : 'Copy'}
+          </button>
+        </div>
+
         <div className="bubble-content">
           {isUser ? (
             <p style={{ margin: 0 }}>{content}</p>

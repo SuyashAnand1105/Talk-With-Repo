@@ -668,6 +668,37 @@ a { text-decoration: none; color: inherit; }
   max-width: min(78%,900px); padding: 0.9rem 1.1rem; position: relative;
 }
 
+/* Message actions */
+.message-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin: -0.25rem 0 0.45rem;
+}
+
+.copy-message-btn {
+  border: 1px solid var(--border-sm);
+  background: rgba(11,7,29,0.48);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  line-height: 1;
+  padding: 0.28rem 0.5rem;
+  transition: color 0.18s, border-color 0.18s, background 0.18s;
+}
+
+.copy-message-btn:hover,
+.copy-message-btn:focus-visible {
+  background: rgba(251,191,36,0.08);
+  border-color: var(--border-gold);
+  color: var(--gold-300);
+  outline: none;
+}
+
+.copy-message-btn.copied {
+  border-color: var(--success-border);
+  color: var(--success);
+}
+
 /* User bubble — gem-cut with gold gradient */
 .bubble-user {
   background: linear-gradient(135deg, rgba(168,85,247,0.2) 0%, rgba(245,158,11,0.14) 100%);
