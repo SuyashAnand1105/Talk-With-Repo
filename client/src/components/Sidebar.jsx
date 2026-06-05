@@ -61,15 +61,32 @@ export default function Sidebar({
         {/* Repository path */}
         <div className="arcane-field">
           <label className="arcane-label">Repository Path</label>
-          <div className="arcane-input-wrap">
+          <div className="arcane-input-wrap" style={{ display: 'flex', gap: '6px' }}>
             <input
               id="repo-path-input"
               className="arcane-input"
+              style={{ flex: 1, minWidth: 0 }}
               value={repoPath}
               onChange={e => setRepoPath(e.target.value)}
               placeholder="e.g.  C:/Projects/my-app"
               spellCheck={false}
             />
+            <button 
+              className="btn btn-secondary btn-sm"
+              style={{ padding: '0 10px', height: 'auto' }}
+              onClick={async () => {
+                try {
+                  const res = await fetch('/api/repo/browse');
+                  const data = await res.json();
+                  if (data.path) setRepoPath(data.path);
+                } catch (err) {
+                  console.error('Browse failed:', err);
+                }
+              }}
+              title="Browse for folder"
+            >
+              Browse
+            </button>
           </div>
         </div>
 

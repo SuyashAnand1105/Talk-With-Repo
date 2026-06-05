@@ -72,4 +72,21 @@ router.get('/status', async (req, res) => {
   }
 });
 
+// ── GET /api/repo/browse ──────────────────────────────────────────────────────
+router.get('/browse', (req, res) => {
+  try {
+    const { execSync } = require('child_process');
+    const script = `
+Add-Type -AssemblyName System.Windows.Forms
+$fbd = New-Object System.Windows.Forms.FolderBrowserDialog
+$fbd.ShowNewFolderButton = $false
+if ($fbd.ShowDialog() -eq 'OK') { $fbd.SelectedPath }
+`;
+    const result = execSync('powershell.exe -STA -NoProfile -Command -', { input: script, encoding: 'utf8' }).trim();
+    res.json({ path: result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
